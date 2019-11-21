@@ -1,0 +1,126 @@
+Met behulp van dynamic performance views (dpv1.sql-dpv9.sql) en 
+views voor de toegekende rechten (vtr1.sql-vtr3.sql) en views voor rollen
+en rechten (vrr1.sql-vrr7.sql) en views voor tabellen,indexen,... (vti1.sql-
+vti8.sql)  kan je hopelijk vlot de volgende vragen beantwoorden.
+
+Geef een lijst met procesnaam en procesid van uw oracleprocessen.
+col program format a45
+col username format a4
+col process format a14
+select sid,username,program,process from v$session;
+clear columns
+
+
+In welke tabel worden er statistieken bijgehouden over de processen. Hoeveel
+user commits zijn er geregistreerd.
+col name format a25
+select * from v$sysstat where statistic# < 30;
+clear columns
+er zijn er 150067 commit geweest sinds opstart
+
+Wat is de juiste naam van de control en redofiles en waar staan deze
+op disk.
+controle v$controlfile
+/u03/oradata/erp/control01.ctl
+/u03/oradata/erp/control02.ctl 
+Redo Buffers is v$logfiles
+/u03/oradata/erp/redo03.log
+/u03/oradata/erp/redo03.log
+/u03/oradata/erp/redo03.log
+
+Uit hoeveel bytes bestaat een datablok.
+select value from v$parameter where name='db_block_size'
+8192 bytes
+
+Hoeveel operating systeem gebruikersprocessen kunnen tegelijkertijd een
+verbinding maken met de databank.
+300 processen
+@dpv9
+
+Hoeveel rijen bevat de dba_tab_privs tabel en hoeveel rijen gaan over uzelf.
+select * from dba_tab_privs; 
+	bevat 45020 rijen
+col username format e402
+col granted_role format a22
+	bevat 1 lijn over mezelf
+
+
+Welke sessie mogelijkheden heb jij gekregen.
+select * from dba_sys_privs where grantee = 'STUDENT';
+STUDENT CREATE VIEW            NO  NO
+STUDENT CREATE SESSION         NO  NO
+STUDENT CREATE PROCEDURE       NO  NO
+STUDENT CREATE SEQUENCE        NO  NO
+STUDENT CREATE TRIGGER         NO  NO
+STUDENT CREATE TABLE           NO  NO
+
+Welke rollen heb jij gekregen.
+select * from role_role_privs
+
+In welke tabel kan je de eigenschappen van de role "student" vinden.
+col role format a11
+col privilege format a22
+select * from role_sys_privs
+STUDENT     CREATE PROCEDURE       NO  NO
+STUDENT     CREATE TRIGGER         NO  NO
+STUDENT     CREATE SEQUENCE        NO  NO
+STUDENT     CREATE VIEW            NO  NO
+STUDENT     CREATE TABLE           NO  NO
+STUDENT     CREATE SESSION         NO  NO
+
+Hoeveel rijen bevat de role_tab_privs tabel.
+col role format a20
+col owner format a10
+col table_name format a20
+col column_name format a10
+col privilege format a10
+select * from role_tab_privs;
+clear columns
+3694 rijen
+
+
+Analyzeer uw tabellen.
+@analyse
+
+Geef van uw tabellen het aantal aanwezige rijen en de gemiddelde rijlengte
+weer. Kan je deze getallen verklaren voor de tabellen docent,lokaal,activiteit.
+TABLE_NAME         BLOCKS   NUM_ROWS AVG_ROW_LEN ANALYZED
+-------------- ---------- ---------- ----------- ------------
+THEORIE                 5         12          11 01/10//09:50
+PRACTICA                5         11          16 01/10//09:50
+OEFPRA                  5         14           7 01/10//09:50
+MINORACT                5         10          25 01/10//09:50
+MINOR                   5          6          46 01/10//09:50
+LOKAAL                  5         70          28 01/10//09:50
+GROEPOEFPRA             5         20          14 01/10//09:50
+FICHE                   5         26          15 01/10//09:50
+DOCENT                  5         27          31 01/10//09:50
+BASISACT                5         22          16 01/10//09:50
+BASIS                   5          7          39 01/10//09:50
+ACTIVITEIT              5         26          25 01/10//09:50
+3 bytes voor de header, lenght byte voor elke kolom (4 bytes), 3,13,1,7 
+3+4+3+13+1+7=31bytes komt tot 31 bytes
+select avg(vsize(Dafk)) from docent;
+select avg(vsize(Dnaam)) from docent;
+select avg(vsize(DGeslacht)) from docent;
+select avg(vsize(DGBD)) from docent;
+
+Hoeveel verschillende gebruikers zijn er gekend.
+col username format a30
+select * from all_users order by username;
+82 gebruikers
+
+Geef informatie over uw tablespace.
+set pagesize 30
+col tablespace_name format a15
+select * from dba_tablespaces where tablespace_name ='E402';
+clear columns
+set pagesize 20
+
+Waar worden al uw beperkingen die je tijdens uw creatie van tabellen
+opgeeft bijgehouden. Bij het bekijken van het resultaat zie je in de 3-de
+kolom de letter P,C of R staan. Verklaar deze letters.
+Primary key(P), constraints (C), foraign key (R)
+
+
+Geef van al uw primary_keys het b_level en het aantal leaf_blocks.

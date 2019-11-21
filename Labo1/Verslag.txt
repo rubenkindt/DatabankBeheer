@@ -1,0 +1,36 @@
+In welk bestand vind je info over waar de redofiles op het systeem komen en
+hoe groot deze gemaakt worden.
+in cloneDBCreation.sql
+
+In welk bestand vind je info over waar de controlfiles op het systeem komen.
+in erp.sh
+
+Noteer voor enkele oracle processen (checkpointwriter,logfilewriter en
+de databasewriter )de reeds gebruikte cpu tijden.
+ora_lgwr_er  == logfileWriter
+ora_dbw0_erp == databaseWriter
+ora_ckpt_erp == checkpointWriter
+ora_reco_erp == recoverer proces wordt gebruikt om de db te herstellen bij het 
+falen van gedistributeerde transacties door te connecteren naar andere db's en 
+het verwijderen van rijen die corresponderen met enkel twijfelachtige transacties
+
+grant all privileges on docent to e403;
+	 select * from e402.docent;
+
+insert into e403.docent (dafk,dnaam) values ('rk','RuebnKindt');
+commit;
+select * from e403.docent;
+update e403.docent set dafk='RK', dnaam='RubenKindt' where dnaam='Meel Jan';
+commit;
+Wanneer merkt uw buur uw update?
+ na de commit
+delete e403.docent; verwijdert alle rijen in de tabel. de tabel zelf bestaat nog, is enkel leeg
+revoke select,delete on docent from e403;
+commit;
+in de user_tab_privs verdwijnt nu de entries die selects en deletes granten.
+
+ 
+
+
+
+
